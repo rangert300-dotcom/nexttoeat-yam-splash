@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fresh Y.A.M. — Next To Eat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Abril+Fatface&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ============================================================
+   OVERLAY & BACKDROP
+   ============================================================ */
+#yam-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Lora', 'Georgia', serif;
+}
+
+#yam-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 25, 20, 0.88);
+  opacity: 0;
+  animation: backdropFadeIn 0.6s ease-out forwards;
+}
+
+/* ============================================================
+   NEWSPAPER CONTAINER
+   ============================================================ */
+#yam-newspaper {
+  position: relative;
+  z-index: 2;
+  width: clamp(320px, 88vw, 880px);
+  max-height: 94vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #C4B9A8 #F5F0E8;
+
+  /* Paper background with subtle texture */
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.008) 3px,
+      rgba(0,0,0,0.008) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.006) 3px,
+      rgba(0,0,0,0.006) 4px
+    ),
+    linear-gradient(
+      180deg,
+      #F7F2EA 0%,
+      #F5F0E8 20%,
+      #F3EEE4 80%,
+      #EDE8DF 100%
+    );
+  background-color: #F5F0E8;
+
+  /* Paper shadow & depth */
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.08),
+    0 4px 8px rgba(0,0,0,0.08),
+    0 12px 24px rgba(0,0,0,0.12),
+    0 24px 48px rgba(0,0,0,0.16),
+    inset 0 0 60px rgba(0,0,0,0.025);
+
+  /* Edge aging */
+  border: 1px solid rgba(0,0,0,0.06);
+
+  /* Initial state — hidden, ready for spin */
+  opacity: 0;
+  transform: scale(0.05) rotate(720deg);
+  transform-origin: center center;
+  will-change: transform, opacity;
+
+  padding: clamp(16px, 3vw, 32px);
+  padding-top: clamp(12px, 2vw, 20px);
+}
+
+/* Webkit scrollbar */
+#yam-newspaper::-webkit-scrollbar { width: 6px; }
+#yam-newspaper::-webkit-scrollbar-track { background: #F5F0E8; }
+#yam-newspaper::-webkit-scrollbar-thumb { background: #C4B9A8; border-radius: 3px; }
+
+/* ============================================================
+   SPIN ENTRY ANIMATION
+   ============================================================ */
+#yam-newspaper.np-enter {
+  animation: newspaperSpin 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes newspaperSpin {
+  0% {
+    opacity: 0;
+    transform: scale(0.05) rotate(720deg);
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* ============================================================
+   BOUNCE / SETTLE
+   ============================================================ */
+#yam-newspaper.np-bounce {
+  animation: newspaperBounce 0.4s ease-out forwards;
+}
+
+@keyframes newspaperBounce {
+  0%   { transform: scale(1) translateY(0); }
+  35%  { transform: scale(1.018) translateY(-3px); }
+  65%  { transform: scale(0.997) translateY(1px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* ============================================================
+   EXIT ANIMATION
+   ============================================================ */
+#yam-newspaper.np-exit {
+  animation: newspaperExit 0.7s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+  pointer-events: none;
+}
+
+@keyframes newspaperExit {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.08) rotate(-600deg) translateY(-120vh);
+  }
+}
+
+#yam-backdrop.bd-exit {
+  animation: backdropFadeOut 0.6s ease-in forwards;
+}
+
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes backdropFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ============================================================
+   DISMISS BUTTON
+   ============================================================ */
+#yam-dismiss {
+  position: absolute;
+  top: clamp(6px, 1vw, 14px);
+  right: clamp(6px, 1vw, 14px);
+  z-index: 20;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border: 2px solid #1A1A1A;
+  border-radius: 4px;
+  background: #F5F0E8;
+  color: #1A1A1A;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+#yam-dismiss:hover,
+#yam-dismiss:focus-visible {
+  background: #1A1A1A;
+  color: #F5F0E8;
+  outline: 2px solid #CC2027;
+  outline-offset: 2px;
+}
+
+#yam-dismiss.visible {
+  opacity: 1;
+  pointer-events: auto;
+  animation: dismissFadeIn 0.35s ease-out forwards;
+}
+
+@keyframes dismissFadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================================
+   MASTHEAD
+   ============================================================ */
+.np-masthead {
+  text-align: center;
+  padding-bottom: clamp(8px, 1.5vw, 16px);
+}
+
+.np-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Lora', serif;
+  font-size: clamp(0.55rem, 1.2vw, 0.75rem);
+  color: #555;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: clamp(4px, 0.8vw, 8px) 0;
+  border-bottom: 1px solid rgba(0,0,0,0.15);
+  margin-bottom: clamp(8px, 1.5vw, 14px);
+}
+
+/* Y.A.M. Logo */
+.np-logo-area {
+  margin: clamp(6px, 1vw, 12px) auto;
+}
+
+.np-yam-logo {
+  display: block;
+  margin: 0 auto;
+  width: clamp(100px, 22vw, 200px);
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* Fallback if image missing */
+.np-yam-logo-fallback {
+  display: none;
+  margin: 0 auto;
+  width: clamp(100px, 22vw, 200px);
+  height: clamp(100px, 22vw, 200px);
+  background: #CC2027;
+  border-radius: 50%;
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.05em;
+}
+
+/* Masthead title */
+.np-title {
+  margin: clamp(4px, 0.8vw, 10px) 0 clamp(2px, 0.4vw, 6px);
+  line-height: 1;
+}
+
+.np-fresh {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 4.5vw, 2.8rem);
+  color: #1A1A1A;
+  letter-spacing: 0.02em;
+}
+
+.np-yam-text {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(2.8rem, 9vw, 5.5rem);
+  color: #CC2027;
+  letter-spacing: 0.04em;
+  display: inline;
+}
+
+.np-subtitle {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.65rem, 1.5vw, 0.95rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #444;
+  margin-bottom: clamp(8px, 1.5vw, 14px);
+}
+
+/* ============================================================
+   DATE BANNER — "COMING SPRING 2026" / "NOW OPEN"
+   ============================================================ */
+.np-date-banner {
+  position: relative;
+  margin: clamp(6px, 1vw, 12px) auto;
+  max-width: 100%;
+}
+
+#coming-soon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1A1A1A;
+  color: #F5F0E8;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 3vw, 1.7rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: clamp(8px, 1.2vw, 14px) clamp(12px, 2vw, 24px);
+  border: 2px solid #CC2027;
+  box-shadow: inset 0 0 0 1px rgba(204,32,39,0.3);
+}
+
+#now-open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1A1A1A;
+  color: #CC2027;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.2rem, 3.5vw, 2rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0;
+  border: 2px solid #CC2027;
+}
+
+#now-open.revealed {
+  opacity: 1;
+  animation: nowOpenGlow 1.2s ease-out forwards;
+}
+
+@keyframes nowOpenGlow {
+  0% {
+    text-shadow: 0 0 20px rgba(204,32,39,0.8), 0 0 40px rgba(204,32,39,0.4);
+    box-shadow: inset 0 0 30px rgba(204,32,39,0.3), 0 0 20px rgba(204,32,39,0.3);
+  }
+  50% {
+    text-shadow: 0 0 40px rgba(204,32,39,1), 0 0 80px rgba(204,32,39,0.6), 0 0 120px rgba(255,180,50,0.3);
+    box-shadow: inset 0 0 50px rgba(204,32,39,0.4), 0 0 40px rgba(204,32,39,0.5);
+  }
+  100% {
+    text-shadow: 0 0 8px rgba(204,32,39,0.5), 0 0 20px rgba(204,32,39,0.2);
+    box-shadow: inset 0 0 0 1px rgba(204,32,39,0.3);
+  }
+}
+
+/* ============================================================
+   DECORATIVE RULES
+   ============================================================ */
+.np-rule {
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.2);
+  margin: clamp(8px, 1.5vw, 16px) 0;
+}
+
+.np-rule-double {
+  border-top: 3px double rgba(0,0,0,0.25);
+  margin: clamp(10px, 1.8vw, 18px) 0;
+}
+
+/* ============================================================
+   HEADLINE
+   ============================================================ */
+.np-headline {
+  text-align: center;
+  padding: clamp(6px, 1.2vw, 14px) 0;
+}
+
+.np-headline h1 {
+  font-family: 'Abril Fatface', 'Playfair Display', serif;
+  font-weight: 400;
+  font-size: clamp(1.7rem, 5.5vw, 3.4rem);
+  line-height: 1.08;
+  color: #1A1A1A;
+  letter-spacing: -0.01em;
+  margin-bottom: clamp(4px, 0.8vw, 10px);
+}
+
+.np-subhead {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(0.75rem, 1.8vw, 1.1rem);
+  color: #444;
+  line-height: 1.3;
+}
+
+/* ============================================================
+   COLUMNS
+   ============================================================ */
+.np-columns {
+  display: flex;
+  gap: 0;
+  padding: clamp(4px, 0.8vw, 10px) 0;
+}
+
+.np-column {
+  flex: 1;
+  padding: 0 clamp(8px, 1.5vw, 16px);
+}
+
+.np-column + .np-column {
+  border-left: 1px solid rgba(0,0,0,0.15);
+}
+
+.np-column h2 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(0.7rem, 1.5vw, 0.95rem);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1A1A1A;
+  margin-bottom: clamp(4px, 0.6vw, 8px);
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  padding-bottom: clamp(2px, 0.4vw, 6px);
+}
+
+.np-column p {
+  font-family: 'Lora', serif;
+  font-size: clamp(0.6rem, 1.2vw, 0.78rem);
+  line-height: 1.55;
+  color: #2A2A2A;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.np-attribution {
+  font-style: italic;
+  font-variant: small-caps;
+  margin-top: clamp(4px, 0.6vw, 8px);
+  font-size: clamp(0.55rem, 1.1vw, 0.72rem) !important;
+  color: #555 !important;
+}
+
+/* Drop caps */
+.drop-cap {
+  float: left;
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(1.8em, 3.5vw, 2.8em);
+  line-height: 0.78;
+  padding-right: 0.07em;
+  padding-top: 0.04em;
+  color: #CC2027;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.np-footer {
+  text-align: center;
+  padding-top: clamp(8px, 1.5vw, 16px);
+  border-top: 3px double rgba(0,0,0,0.2);
+}
+
+.np-nte-logo {
+  display: block;
+  margin: clamp(6px, 1vw, 12px) auto;
+  width: clamp(120px, 28vw, 260px);
+  height: auto;
+  object-fit: contain;
+}
+
+.np-nte-logo-fallback {
+  display: none;
+  margin: clamp(6px, 1vw, 12px) auto;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: #1A1A1A;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.np-footer-text {
+  font-family: 'Lora', serif;
+  font-size: clamp(0.55rem, 1.1vw, 0.72rem);
+  color: #666;
+  letter-spacing: 0.06em;
+  padding-bottom: clamp(4px, 0.8vw, 10px);
+}
+
+/* ============================================================
+   SHATTER EFFECT — CRACK LINES
+   ============================================================ */
+.crack-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+
+.crack-line {
+  position: absolute;
+  height: 1px;
+  transform-origin: 0% 50%;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+
+.crack-line.animate {
+  animation: crackGrow 0.3s ease-out forwards;
+}
+
+@keyframes crackGrow {
+  0%   { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+/* ============================================================
+   SHATTER EFFECT — SHARDS
+   ============================================================ */
+.shard-container {
+  pointer-events: none;
+  overflow: visible;
+}
+
+.shard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+/* Glint highlight on each shard */
+.shard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(255,255,255,0.35) 45%,
+    rgba(255,255,255,0.08) 55%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.shard.burst {
+  animation: shardBurst var(--duration, 0.7s) cubic-bezier(0.25, 0.46, 0.45, 0.94) var(--delay, 0s) forwards;
+}
+
+@keyframes shardBurst {
+  0% {
+    transform: translate3d(0, 0, 0) rotateX(0deg) rotateZ(0deg);
+    opacity: 1;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--tx, 100px), var(--ty, 200px), 0) rotateX(var(--rx, 90deg)) rotateZ(var(--rz, 180deg));
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   SHOCKWAVE
+   ============================================================ */
+.shockwave {
+  position: fixed;
+  pointer-events: none;
+  border: 2px solid rgba(204, 32, 39, 0.5);
+  border-radius: 50%;
+  transform: scale(0);
+  opacity: 1;
+  z-index: 100001;
+  animation: shockwaveExpand 0.6s ease-out forwards;
+}
+
+@keyframes shockwaveExpand {
+  0% {
+    transform: scale(0);
+    opacity: 0.7;
+    border-width: 3px;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+/* ============================================================
+   SCREEN SHAKE
+   ============================================================ */
+#yam-newspaper.shake {
+  animation: screenShake 0.18s ease-out;
+}
+
+@keyframes screenShake {
+  0%   { transform: translate(0, 0); }
+  15%  { transform: translate(-4px, 2px); }
+  30%  { transform: translate(3px, -3px); }
+  45%  { transform: translate(-2px, 3px); }
+  60%  { transform: translate(3px, -1px); }
+  75%  { transform: translate(-1px, 2px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ============================================================
+   SPARKLES
+   ============================================================ */
+.sparkle {
+  position: fixed;
+  pointer-events: none;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  z-index: 100001;
+  animation: sparkleTwinkle var(--sparkle-dur, 0.8s) ease-out var(--sparkle-delay, 0s) forwards;
+}
+
+@keyframes sparkleTwinkle {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.5) rotate(90deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0) rotate(270deg) translateY(var(--sparkle-drift, 20px));
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  #yam-newspaper {
+    width: 95vw;
+    padding: clamp(12px, 3vw, 20px);
+    max-height: 92vh;
+  }
+
+  .np-columns {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .np-column + .np-column {
+    border-left: none;
+    border-top: 1px solid rgba(0,0,0,0.12);
+    padding-top: clamp(6px, 1.5vw, 10px);
+    margin-top: clamp(6px, 1.5vw, 10px);
+  }
+
+  .np-column {
+    padding: 0;
+  }
+
+  .np-column p {
+    text-align: left;
+  }
+}
+
+@media (min-width: 1600px) {
+  #yam-newspaper {
+    max-width: 920px;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  #yam-newspaper {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: scale(1) rotate(0) !important;
+    transition: opacity 0.4s ease !important;
+  }
+
+  #yam-newspaper.np-enter {
+    animation: simpleFadeIn 0.5s ease-out forwards !important;
+  }
+
+  #yam-newspaper.np-exit {
+    animation: simpleFadeOut 0.4s ease-in forwards !important;
+  }
+
+  #yam-backdrop {
+    animation-duration: 0.3s !important;
+  }
+
+  .shard { animation: none !important; }
+  .crack-line { animation: none !important; }
+  .shockwave { animation: none !important; display: none; }
+  .sparkle { animation: none !important; display: none; }
+  #yam-newspaper.shake { animation: none !important; }
+}
+
+@keyframes simpleFadeIn {
+  from { opacity: 0; transform: scale(1); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes simpleFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ============================================================
+   ORNAMENTAL / EXTRAS
+   ============================================================ */
+.np-ornament {
+  text-align: center;
+  font-size: clamp(0.6rem, 1.2vw, 0.85rem);
+  color: #999;
+  letter-spacing: 0.3em;
+  padding: clamp(2px, 0.4vw, 6px) 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     OVERLAY
+     ============================================================ -->
+<div id="yam-overlay" role="dialog" aria-modal="true" aria-label="Y.A.M. Launch Announcement">
+  <div id="yam-backdrop"></div>
+
+  <div id="yam-newspaper">
+    <!-- DISMISS BUTTON -->
+    <button id="yam-dismiss" aria-label="Close announcement">&#x2715;</button>
+
+    <!-- ====== MASTHEAD ====== -->
+    <header class="np-masthead">
+      <div class="np-meta-row">
+        <span>Central City, New Orleans</span>
+        <span>Vol. 1 &middot; No. 1</span>
+      </div>
+
+      <!-- Y.A.M. Logo -->
+      <div class="np-logo-area">
+        <img
+          src="./assets/123_1.jpeg"
+          alt="Y.A.M. — Young Adult Market"
+          class="np-yam-logo"
+          id="yam-logo-img"
+        >
+        <div class="np-yam-logo-fallback" id="yam-logo-fallback">Y.A.M.</div>
+      </div>
+
+      <!-- Masthead Title -->
+      <div class="np-title">
+        <span class="np-fresh">fresh</span>&nbsp;<span class="np-yam-text">Y.A.M.</span>
+      </div>
+      <div class="np-subtitle">Young Adult Market</div>
+
+      <!-- Date Banner -->
+      <div class="np-date-banner" id="date-banner">
+        <div id="coming-soon">COMING SPRING 2026</div>
+        <div id="now-open">NOW OPEN</div>
+      </div>
+
+      <div class="np-rule np-rule-double"></div>
+    </header>
+
+    <!-- ====== HEADLINE ====== -->
+    <section class="np-headline">
+      <h1>Y.A.M. is Next To Eat.</h1>
+      <p class="np-subhead">Next To Eat's Young Adult Market Opens on Simon Bolivar</p>
+    </section>
+
+    <div class="np-rule"></div>
+
+    <!-- ====== COLUMNS ====== -->
+    <section class="np-columns">
+      <article class="np-column">
+        <h2>The Mission</h2>
+        <p><span class="drop-cap">&ldquo;I</span>&rsquo;m trying to be the person I was looking for when I was younger. Real progress starts when we stop waiting to be included and start investing in ourselves.&rdquo;</p>
+        <p class="np-attribution">&mdash; Chef Gary Netter, Founder</p>
+      </article>
+
+      <article class="np-column">
+        <h2>What is Y.A.M.?</h2>
+        <p><span class="drop-cap">A</span> young adult third space where youth showcase entrepreneurial skills, art, music, poetry, fashion, and creative talents. Yammers explore mental health wellness, wholistic lifestyles, food consciousness, and self-care practices. Come for fellowship in multiple disciplines. Stay for the poke bowls and vibes.</p>
+      </article>
+
+      <article class="np-column">
+        <h2>&ldquo;I Yam What I Yam&rdquo;</h2>
+        <p><span class="drop-cap">M</span>ore than a market&nbsp;&mdash; a movement. Yammers yamming what they yam: owning who they are and prospering confidently in their chaotic, omnipotent truths.</p>
+      </article>
+    </section>
+
+    <div class="np-rule"></div>
+
+    <div class="np-ornament">&bull; &bull; &bull;</div>
+
+    <!-- ====== FOOTER ====== -->
+    <footer class="np-footer">
+      <img
+        src="./assets/Next_To_Eat_WCM_CMYK_High_Res-01.png"
+        alt="Next To Eat — Wholistic Culinary Market"
+        class="np-nte-logo"
+        id="nte-logo-img"
+      >
+      <div class="np-nte-logo-fallback" id="nte-logo-fallback">
+        NEXT TO EAT<br>
+        <small style="font-weight:400;font-size:0.6em;letter-spacing:0.15em;">Wholistic Culinary Market</small>
+      </div>
+      <p class="np-footer-text">A Next To Eat Initiative &middot; nexttoeat.com</p>
+    </footer>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   CONFIG
+   ============================================================= */
+const NOW_OPEN = false; // Set to true when Y.A.M. officially opens
+
+/* =============================================================
+   DOM REFERENCES
+   ============================================================= */
+const overlay    = document.getElementById('yam-overlay');
+const backdrop   = document.getElementById('yam-backdrop');
+const newspaper  = document.getElementById('yam-newspaper');
+const dismissBtn = document.getElementById('yam-dismiss');
+const comingSoon = document.getElementById('coming-soon');
+const nowOpen    = document.getElementById('now-open');
+const dateBanner = document.getElementById('date-banner');
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* =============================================================
+   IMAGE FALLBACKS
+   ============================================================= */
+document.getElementById('yam-logo-img').addEventListener('error', function() {
+  this.style.display = 'none';
+  const fb = document.getElementById('yam-logo-fallback');
+  fb.style.display = 'flex';
+});
+
+document.getElementById('nte-logo-img').addEventListener('error', function() {
+  this.style.display = 'none';
+  const fb = document.getElementById('nte-logo-fallback');
+  fb.style.display = 'block';
+});
+
+/* =============================================================
+   FOCUS TRAP
+   ============================================================= */
+function trapFocus() {
+  dismissBtn.focus();
+  overlay.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      dismissBtn.focus();
+    }
+    if (e.key === 'Escape') {
+      dismiss();
+    }
+  });
+}
+
+/* =============================================================
+   SHARD GENERATION (Voronoi-like grid tessellation)
+   ============================================================= */
+function generateShards(sourceEl) {
+  const isMobile = window.innerWidth < 768;
+  const cols = isMobile ? 5 : 7;
+  const rows = isMobile ? 3 : 5;
+
+  // Generate jittered grid intersection points (as percentages 0-100)
+  const pts = [];
+  for (let r = 0; r <= rows; r++) {
+    pts[r] = [];
+    for (let c = 0; c <= cols; c++) {
+      let px = (c / cols) * 100;
+      let py = (r / rows) * 100;
+      // Jitter interior points
+      if (r > 0 && r < rows && c > 0 && c < cols) {
+        px += (Math.random() - 0.5) * (100 / cols) * 0.65;
+        py += (Math.random() - 0.5) * (100 / rows) * 0.65;
+      }
+      // Clamp to bounds
+      px = Math.max(0, Math.min(100, px));
+      py = Math.max(0, Math.min(100, py));
+      pts[r][c] = { x: px, y: py };
+    }
+  }
+
+  const shards = [];
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const tl = pts[r][c];
+      const tr = pts[r][c + 1];
+      const bl = pts[r + 1][c];
+      const br = pts[r + 1][c + 1];
+
+      // Split each cell into 2 triangles via random diagonal
+      let triangles;
+      if (Math.random() > 0.5) {
+        triangles = [[tl, tr, br], [tl, br, bl]];
+      } else {
+        triangles = [[tl, tr, bl], [tr, br, bl]];
+      }
+
+      triangles.forEach(tri => {
+        // Compute centroid for trajectory direction
+        const cx = (tri[0].x + tri[1].x + tri[2].x) / 3;
+        const cy = (tri[0].y + tri[1].y + tri[2].y) / 3;
+
+        // Direction from center of element
+        const angle = Math.atan2(cy - 50, cx - 50);
+        const dist  = 150 + Math.random() * 350;
+        const tx    = Math.cos(angle) * dist + (Math.random() - 0.5) * 150;
+        // Gravity bias: add downward drift
+        const ty    = Math.sin(angle) * dist + Math.random() * 200 + 50;
+        const rz    = (Math.random() - 0.5) * 600;
+        const rx    = (Math.random() - 0.5) * 300;
+        const delay = Math.random() * 0.12;
+        const dur   = 0.55 + Math.random() * 0.45;
+
+        const clipPath = `polygon(${tri.map(p => p.x.toFixed(2) + '% ' + p.y.toFixed(2) + '%').join(', ')})`;
+
+        shards.push({ clipPath, tx, ty, rz, rx, delay, dur });
+      });
+    }
+  }
+
+  return shards;
+}
+
+/* =============================================================
+   CREATE CRACK LINES
+   ============================================================= */
+function createCracks(containerEl) {
+  const crackCount = 12;
+  const w = containerEl.offsetWidth;
+  const h = containerEl.offsetHeight;
+  const cx = w / 2;
+  const cy = h / 2;
+
+  const crackOverlay = document.createElement('div');
+  crackOverlay.className = 'crack-overlay';
+  crackOverlay.style.position = 'absolute';
+  crackOverlay.style.top = '0';
+  crackOverlay.style.left = '0';
+  crackOverlay.style.width = '100%';
+  crackOverlay.style.height = '100%';
+  crackOverlay.style.zIndex = '5';
+  crackOverlay.style.pointerEvents = 'none';
+
+  for (let i = 0; i < crackCount; i++) {
+    const crack = document.createElement('div');
+    crack.className = 'crack-line';
+    const angle = (i / crackCount) * 360 + (Math.random() - 0.5) * 25;
+    const length = Math.max(w, h) * (0.5 + Math.random() * 0.5);
+    crack.style.left = cx + 'px';
+    crack.style.top = cy + 'px';
+    crack.style.width = length + 'px';
+    crack.style.background = `linear-gradient(to right,
+      rgba(255,255,255,0.9) 0%,
+      rgba(255,255,255,0.5) 40%,
+      rgba(255,255,255,0.1) 100%
+    )`;
+    crack.style.transform = `rotate(${angle}deg) scaleX(0)`;
+    crack.style.animationDelay = (Math.random() * 0.15) + 's';
+    // Trigger animation
+    requestAnimationFrame(() => crack.classList.add('animate'));
+    crackOverlay.appendChild(crack);
+  }
+
+  containerEl.style.position = 'relative';
+  containerEl.appendChild(crackOverlay);
+
+  return crackOverlay;
+}
+
+/* =============================================================
+   TRIGGER SHATTER SEQUENCE
+   ============================================================= */
+function triggerShatter() {
+  if (prefersReducedMotion) {
+    // Reduced motion: just swap text immediately
+    comingSoon.style.display = 'none';
+    nowOpen.classList.add('revealed');
+    showDismiss();
+    return;
+  }
+
+  const rect = comingSoon.getBoundingClientRect();
+  const styles = window.getComputedStyle(comingSoon);
+
+  // Phase 1: Cracks
+  const crackOverlay = createCracks(comingSoon);
+
+  // Phase 2: Burst (after cracks finish)
+  setTimeout(() => {
+    // Generate shard data
+    const shardData = generateShards(comingSoon);
+
+    // Create fixed-position shard container at the exact banner location
+    const shardContainer = document.createElement('div');
+    shardContainer.className = 'shard-container';
+    shardContainer.style.position = 'fixed';
+    shardContainer.style.left = rect.left + 'px';
+    shardContainer.style.top = rect.top + 'px';
+    shardContainer.style.width = rect.width + 'px';
+    shardContainer.style.height = rect.height + 'px';
+    shardContainer.style.zIndex = '100000';
+    shardContainer.style.overflow = 'visible';
+    shardContainer.style.pointerEvents = 'none';
+
+    // Copy essential styles for shard rendering
+    const bg = styles.background;
+    const color = styles.color;
+    const font = styles.font;
+    const ls = styles.letterSpacing;
+    const border = styles.border;
+    const padding = styles.padding;
+    const textContent = comingSoon.textContent;
+
+    shardData.forEach(s => {
+      const shard = document.createElement('div');
+      shard.className = 'shard';
+      shard.style.clipPath = s.clipPath;
+      shard.style.background = bg;
+      shard.style.color = color;
+      shard.style.font = font;
+      shard.style.letterSpacing = ls;
+      shard.style.display = 'flex';
+      shard.style.alignItems = 'center';
+      shard.style.justifyContent = 'center';
+      shard.style.setProperty('--tx', s.tx + 'px');
+      shard.style.setProperty('--ty', s.ty + 'px');
+      shard.style.setProperty('--rz', s.rz + 'deg');
+      shard.style.setProperty('--rx', s.rx + 'deg');
+      shard.style.setProperty('--delay', s.delay + 's');
+      shard.style.setProperty('--duration', s.dur + 's');
+      shard.textContent = textContent;
+      shardContainer.appendChild(shard);
+    });
+
+    overlay.appendChild(shardContainer);
+
+    // Hide original text & crack overlay
+    comingSoon.style.visibility = 'hidden';
+    if (crackOverlay.parentNode) crackOverlay.remove();
+
+    // Trigger burst animation on all shards
+    requestAnimationFrame(() => {
+      shardContainer.querySelectorAll('.shard').forEach(s => s.classList.add('burst'));
+    });
+
+    // Screen shake
+    newspaper.classList.add('shake');
+    setTimeout(() => newspaper.classList.remove('shake'), 200);
+
+    // Shockwave
+    createShockwave(rect);
+
+    // Reveal "NOW OPEN" after shards start clearing
+    setTimeout(() => {
+      nowOpen.classList.add('revealed');
+      createSparkles(rect);
+    }, 250);
+
+    // Clean up shards & show dismiss
+    setTimeout(() => {
+      if (shardContainer.parentNode) shardContainer.remove();
+      showDismiss();
+    }, 1200);
+
+  }, 350); // Wait for cracks to draw
+}
+
+/* =============================================================
+   SHOCKWAVE
+   ============================================================= */
+function createShockwave(originRect) {
+  const cx = originRect.left + originRect.width / 2;
+  const cy = originRect.top + originRect.height / 2;
+  const size = Math.max(window.innerWidth, window.innerHeight) * 0.8;
+
+  const wave = document.createElement('div');
+  wave.className = 'shockwave';
+  wave.style.left = (cx - size / 2) + 'px';
+  wave.style.top = (cy - size / 2) + 'px';
+  wave.style.width = size + 'px';
+  wave.style.height = size + 'px';
+  overlay.appendChild(wave);
+
+  // Second wave with delay
+  const wave2 = wave.cloneNode();
+  wave2.style.animationDelay = '0.08s';
+  wave2.style.borderColor = 'rgba(255, 180, 50, 0.3)';
+  overlay.appendChild(wave2);
+
+  setTimeout(() => {
+    wave.remove();
+    wave2.remove();
+  }, 800);
+}
+
+/* =============================================================
+   SPARKLES
+   ============================================================= */
+function createSparkles(originRect) {
+  const cx = originRect.left + originRect.width / 2;
+  const cy = originRect.top + originRect.height / 2;
+  const count = window.innerWidth < 768 ? 10 : 18;
+
+  for (let i = 0; i < count; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'sparkle';
+
+    const x = cx + (Math.random() - 0.5) * originRect.width * 1.5;
+    const y = cy + (Math.random() - 0.5) * originRect.height * 3;
+    const size = 2 + Math.random() * 5;
+    const hue = Math.random() > 0.5 ? '40' : '0';  // gold or red
+    const dur = 0.5 + Math.random() * 0.8;
+    const delay = Math.random() * 0.4;
+    const drift = 10 + Math.random() * 30;
+
+    spark.style.left = x + 'px';
+    spark.style.top = y + 'px';
+    spark.style.width = size + 'px';
+    spark.style.height = size + 'px';
+    spark.style.background = `radial-gradient(circle, hsla(${hue}, 90%, 60%, 1), hsla(${hue}, 90%, 50%, 0.4))`;
+    spark.style.boxShadow = `0 0 ${size}px hsla(${hue}, 90%, 60%, 0.6)`;
+    spark.style.setProperty('--sparkle-dur', dur + 's');
+    spark.style.setProperty('--sparkle-delay', delay + 's');
+    spark.style.setProperty('--sparkle-drift', drift + 'px');
+
+    overlay.appendChild(spark);
+
+    setTimeout(() => spark.remove(), (dur + delay) * 1000 + 100);
+  }
+}
+
+/* =============================================================
+   SHOW DISMISS BUTTON
+   ============================================================= */
+function showDismiss() {
+  dismissBtn.classList.add('visible');
+  trapFocus();
+}
+
+/* =============================================================
+   DISMISS
+   ============================================================= */
+function dismiss() {
+  if (newspaper.classList.contains('np-exit')) return; // already dismissing
+
+  newspaper.classList.remove('np-bounce', 'shake');
+  newspaper.style.animation = 'none';
+  // Force reflow
+  void newspaper.offsetHeight;
+  newspaper.style.animation = '';
+
+  newspaper.classList.add('np-exit');
+  backdrop.classList.add('bd-exit');
+
+  newspaper.addEventListener('animationend', function handler(e) {
+    if (e.animationName === 'newspaperExit') {
+      overlay.remove();
+      newspaper.removeEventListener('animationend', handler);
+    }
+  });
+
+  // Fallback removal
+  setTimeout(() => {
+    if (overlay.parentNode) overlay.remove();
+  }, 1000);
+}
+
+/* =============================================================
+   MAIN SEQUENCE
+   ============================================================= */
+function init() {
+  if (prefersReducedMotion) {
+    // Reduced motion path
+    newspaper.style.opacity = '1';
+    newspaper.style.transform = 'scale(1) rotate(0)';
+    newspaper.classList.add('np-enter');
+
+    setTimeout(() => {
+      if (NOW_OPEN) {
+        comingSoon.style.display = 'none';
+        nowOpen.classList.add('revealed');
+      }
+      showDismiss();
+    }, 600);
+
+    dismissBtn.addEventListener('click', dismiss);
+    return;
+  }
+
+  // Start entry animation
+  requestAnimationFrame(() => {
+    newspaper.classList.add('np-enter');
+  });
+
+  // Listen for spin end
+  newspaper.addEventListener('animationend', function handler(e) {
+    if (e.animationName === 'newspaperSpin') {
+      newspaper.removeEventListener('animationend', handler);
+
+      // Set stable base state
+      newspaper.style.opacity = '1';
+      newspaper.style.transform = 'scale(1) rotate(0deg)';
+      newspaper.classList.remove('np-enter');
+
+      // Bounce
+      requestAnimationFrame(() => {
+        newspaper.classList.add('np-bounce');
+      });
+
+      newspaper.addEventListener('animationend', function bounceHandler(e2) {
+        if (e2.animationName === 'newspaperBounce') {
+          newspaper.removeEventListener('animationend', bounceHandler);
+          newspaper.classList.remove('np-bounce');
+          onLanded();
+        }
+      });
+    }
+  });
+
+  dismissBtn.addEventListener('click', dismiss);
+}
+
+function onLanded() {
+  if (NOW_OPEN) {
+    // Wait 2 seconds for reader to absorb, then shatter
+    setTimeout(triggerShatter, 2000);
+  } else {
+    // No shatter — just show dismiss after brief pause
+    setTimeout(showDismiss, 500);
+  }
+}
+
+/* =============================================================
+   LAUNCH
+   ============================================================= */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
