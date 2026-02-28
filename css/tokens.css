@@ -1,0 +1,26 @@
+/* =============================================================
+   DESIGN TOKENS — Next To Eat / Y.A.M.
+   Shared custom properties for the entire site.
+   Banner palette is the authority.
+   ============================================================= */
+:root {
+  /* Core palette (from banner — this is canon) */
+  --dark: #1A1A1A;
+  --cream: #F5F0E8;
+  --red: #CC2027;
+  --red-dark: #a61a22;
+  --gold: #C9A84C;
+  --green: #2D5016;
+  --green-light: #4a7c28;
+
+  /* Typography */
+  --font-display: 'Playfair Display', serif;
+  --font-headline: 'Abril Fatface', 'Playfair Display', serif;
+  --font-body: 'Lora', 'Georgia', serif;
+  --font-ui: 'Oswald', sans-serif;
+
+  /* Paper texture (from banner) */
+  --paper-bg: linear-gradient(180deg, #F7F2EA 0%, #F5F0E8 20%, #F3EEE4 80%, #EDE8DF 100%);
+  --paper-texture: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.008) 3px, rgba(0,0,0,0.008) 4px),
+                   repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0,0,0,0.006) 3px, rgba(0,0,0,0.006) 4px);
+}
