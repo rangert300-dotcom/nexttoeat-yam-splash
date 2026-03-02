@@ -243,7 +243,7 @@
 .np-yam-logo {
   display: block;
   margin: 0 auto;
-  width: clamp(100px, 22vw, 200px);
+  width: clamp(50px, 12vw, 80px);
   height: auto;
   object-fit: contain;
   border-radius: 6px;
@@ -253,14 +253,14 @@
 .np-yam-logo-fallback {
   display: none;
   margin: 0 auto;
-  width: clamp(100px, 22vw, 200px);
-  height: clamp(100px, 22vw, 200px);
+  width: clamp(50px, 12vw, 80px);
+  height: clamp(50px, 12vw, 80px);
   background: var(--red);
   border-radius: 50%;
   color: #fff;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-size: clamp(1rem, 3vw, 1.8rem);
   align-items: center;
   justify-content: center;
   letter-spacing: 0.05em;
@@ -406,100 +406,6 @@
   line-height: 1.3;
 }
 
-/* =============================================================
-   COLUMNS
-   ============================================================= */
-.np-columns {
-  display: flex;
-  gap: 0;
-  padding: clamp(4px, 0.8vw, 10px) 0;
-}
-
-.np-column {
-  flex: 1;
-  padding: 0 clamp(8px, 1.5vw, 16px);
-}
-
-.np-column + .np-column {
-  border-left: 1px solid rgba(0,0,0,0.15);
-}
-
-.np-column h2 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(0.7rem, 1.5vw, 0.95rem);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--dark);
-  margin-bottom: clamp(4px, 0.6vw, 8px);
-  border-bottom: 1px solid rgba(0,0,0,0.12);
-  padding-bottom: clamp(2px, 0.4vw, 6px);
-}
-
-.np-column p {
-  font-family: var(--font-body);
-  font-size: clamp(0.6rem, 1.2vw, 0.78rem);
-  line-height: 1.55;
-  color: #2A2A2A;
-  text-align: justify;
-  hyphens: auto;
-}
-
-.np-attribution {
-  font-style: italic;
-  font-variant: small-caps;
-  margin-top: clamp(4px, 0.6vw, 8px);
-  font-size: clamp(0.55rem, 1.1vw, 0.72rem) !important;
-  color: #555 !important;
-}
-
-/* Drop caps */
-.drop-cap {
-  float: left;
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: clamp(1.8em, 3.5vw, 2.8em);
-  line-height: 0.78;
-  padding-right: 0.07em;
-  padding-top: 0.04em;
-  color: var(--red);
-}
-
-/* =============================================================
-   FOOTER
-   ============================================================= */
-.np-footer {
-  text-align: center;
-  padding-top: clamp(8px, 1.5vw, 16px);
-  border-top: 3px double rgba(0,0,0,0.2);
-}
-
-.np-nte-logo {
-  display: block;
-  margin: clamp(6px, 1vw, 12px) auto;
-  width: clamp(120px, 28vw, 260px);
-  height: auto;
-  object-fit: contain;
-}
-
-.np-nte-logo-fallback {
-  display: none;
-  margin: clamp(6px, 1vw, 12px) auto;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(1rem, 2.5vw, 1.4rem);
-  color: var(--dark);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.np-footer-text {
-  font-family: var(--font-body);
-  font-size: clamp(0.55rem, 1.1vw, 0.72rem);
-  color: #666;
-  letter-spacing: 0.06em;
-  padding-bottom: clamp(4px, 0.8vw, 10px);
-}
 
 /* =============================================================
    SHATTER EFFECT — CRACK LINES
@@ -687,25 +593,6 @@
     min-height: 18px;
   }
 
-  .np-columns {
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .np-column + .np-column {
-    border-left: none;
-    border-top: 1px solid rgba(0,0,0,0.12);
-    padding-top: clamp(6px, 1.5vw, 10px);
-    margin-top: clamp(6px, 1.5vw, 10px);
-  }
-
-  .np-column {
-    padding: 0;
-  }
-
-  .np-column p {
-    text-align: left;
-  }
 }
 
 @media (min-width: 1600px) {
@@ -755,12 +642,125 @@
 }
 
 /* =============================================================
-   ORNAMENTAL / EXTRAS
+   FLOATING CTA — "Enter the Market"
    ============================================================= */
-.np-ornament {
-  text-align: center;
-  font-size: clamp(0.6rem, 1.2vw, 0.85rem);
-  color: #999;
-  letter-spacing: 0.3em;
-  padding: clamp(2px, 0.4vw, 6px) 0;
+.np-enter-cta {
+  position: fixed;
+  bottom: clamp(24px, 4vh, 48px);
+  left: 50%;
+  z-index: 100002;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+
+  color: var(--cream);
+  background: var(--red);
+  border: 2px solid rgba(255,255,255,0.15);
+  padding: clamp(14px, 1.5vh, 18px) clamp(28px, 4vw, 48px);
+  min-height: 48px;
+  cursor: pointer;
+
+  /* Start hidden — JS adds .visible */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(20px) scale(0.9);
+  transition: background 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.np-enter-cta.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0) scale(1);
+  animation: ctaReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+             ctaPulse 2s ease-in-out 1s infinite;
+}
+
+.np-enter-cta:hover,
+.np-enter-cta:focus-visible {
+  background: var(--red-dark);
+  color: var(--cream);
+  transform: translateX(-50%) translateY(-3px) scale(1.04);
+  box-shadow:
+    0 0 24px rgba(204,32,39,0.6),
+    0 0 60px rgba(204,32,39,0.3),
+    0 8px 24px rgba(0,0,0,0.3);
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.np-enter-cta:active {
+  transform: translateX(-50%) translateY(0) scale(0.98);
+}
+
+/* Entrance animation */
+@keyframes ctaReveal {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(30px) scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* Ambient glow pulse */
+@keyframes ctaPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 12px rgba(204,32,39,0.4),
+      0 0 32px rgba(204,32,39,0.15),
+      0 4px 16px rgba(0,0,0,0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(204,32,39,0.6),
+      0 0 50px rgba(204,32,39,0.25),
+      0 0 80px rgba(255,180,50,0.1),
+      0 4px 16px rgba(0,0,0,0.2);
+  }
+}
+
+/* Arrow bounce on the CTA */
+.np-enter-cta .cta-arrow {
+  display: inline-block;
+  animation: ctaArrowBounce 1.5s ease-in-out 1.5s infinite;
+}
+
+@keyframes ctaArrowBounce {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+@media (max-width: 768px) {
+  .np-enter-cta {
+    width: 85vw;
+    max-width: 340px;
+    text-align: center;
+    font-size: clamp(0.8rem, 3.5vw, 1rem);
+    padding: 16px 24px;
+    min-height: 52px;
+    bottom: clamp(16px, 3vh, 32px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .np-enter-cta.visible {
+    animation: none;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+  .np-enter-cta .cta-arrow {
+    animation: none;
+  }
 }

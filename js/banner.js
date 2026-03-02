@@ -55,17 +55,29 @@
   }
 
   /* =============================================================
-     FOCUS TRAP
+     FOCUS TRAP — cycles between dismiss button and CTA link
      ============================================================= */
   function trapFocus() {
+    var ctaLink = document.querySelector('.np-enter-cta');
+    var focusables = [dismissBtn];
+    if (ctaLink) focusables.push(ctaLink);
+
     dismissBtn.focus();
     overlay.addEventListener('keydown', function(e) {
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        dismissBtn.focus();
-      }
       if (e.key === 'Escape') {
         dismiss();
+        return;
+      }
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        var current = focusables.indexOf(document.activeElement);
+        var next;
+        if (e.shiftKey) {
+          next = current <= 0 ? focusables.length - 1 : current - 1;
+        } else {
+          next = current >= focusables.length - 1 ? 0 : current + 1;
+        }
+        focusables[next].focus();
       }
     });
   }
@@ -328,11 +340,24 @@
   }
 
   /* =============================================================
-     SHOW DISMISS BUTTON + "DON'T SHOW AGAIN"
+     SHOW DISMISS BUTTON + "DON'T SHOW AGAIN" + CTA
      ============================================================= */
   function showDismiss() {
     dismissBtn.classList.add('visible');
     if (noRepeatLabel) noRepeatLabel.classList.add('visible');
+
+    // Inject floating CTA — appears outside the newspaper, over the backdrop
+    var cta = document.createElement('a');
+    cta.href = 'yam.html';
+    cta.className = 'np-enter-cta';
+    cta.innerHTML = 'Enter the Market <span class="cta-arrow">\u2192</span>';
+    overlay.appendChild(cta);
+
+    // Stagger the CTA entrance slightly after dismiss appears
+    setTimeout(function() {
+      cta.classList.add('visible');
+    }, 300);
+
     trapFocus();
   }
 
